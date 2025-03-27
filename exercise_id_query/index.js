@@ -13,39 +13,56 @@ const animals = [
 ];
 
 app.get("/animals", (req, res) => {
-  res = res.json();
+  res.json(animals);
 });
 
 app.get("/animals/:id", (req, res) => {
-  res = res.json();
   const animalId = parseInt(req.params.id);
-  const findAnimal = animals.find((animal) => animal.id == id);
+  const findAnimal = animals.find((animal) => animal.id === animalId);
+
+  if (!findAnimal) {
+    return res.status(404).json({ error: "Animal not found" });
+  }
+
   res.json(findAnimal);
 });
 
-app.get("/animals/search", (req, res) => {
-  const { name, art, age } = req.query;
-  const output = animals;
+//app.get("/animals/art", (req, res) => {
+//const { name, art, age } = req.query;
+//const output = animals;
 
-  if (name) output = output.filter((animal) => animal.animalName == name);
-  if (art) output = output.filter((animal) => animal.animalArt == art);
-  if (age) output = output.filter((animal) => animal.age == age);
+//if (name) output = output.filter((animal) => animal.animalName == name);
+//if (art) output = output.filter((animal) => animal.animalArt == art);
+// if (age) output = output.filter((animal) => animal.age == age);
 
-  res.json(animals.animalName);
+// res.json(animals.animalName);
+//});
+
+ap.get("/animals/art", (req, res) => {
+  const animalArt = req.query.art;
+  const output = animals.filter((animals) => animals.animalArt === animalArt);
+  res.json(output);
 });
 
-//app.get("/animals/search", (req, res) => {
-//const animalArt = req.query.art;
-//const output = animals.filter((animals) => animals.art == animalArt);
+// route GET /tiere/search?art=hund
 
-//res.json(art); // may be better?
-//});
+app.get("/animals/age", (req, res) => {
+  const animalAge = req.query.age;
+  const age = animals.filter((animals) => animals.age === age);
+  res.json(age);
+});
 
-//app.get("/animals/search", (req, res) => {
-//const animalAge = req.query.age;
-//const output = animals.filter((animals) => animals.age == age);
-//res.send(animals.animalAge);
-//res.json(age);
-//});
+app.use(express.json()); // allows to send the body with the request
+app.post("/animals", (req, res) => {
+  const { art, name, age } = req.body; // the way of writing == "Destructuring" -> jason format as dictionary
+  const newAnimal = {
+    id: animal.length + 1,
+    animalArt: art,
+    animalName: name,
+    age: age,
+  };
+  users.push(newAnimal(newAnimal));
+  res.json(animals);
+});
 
 app.listen(5005);
