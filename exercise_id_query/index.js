@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.use(express.json()); // needed for POST to parse the incoming JSON body
 
 const animals = [
   { id: 1, animalArt: "dog", animalName: "Bobo", age: 6 },
@@ -12,57 +13,65 @@ const animals = [
   { id: 8, animalArt: "cat", animalName: "Alice", age: 11 },
 ];
 
+// GET /animals - return all animals
+//
+// example: GET localhost:5005/animals
+//
 app.get("/animals", (req, res) => {
-  res.json(animals);
+  res = res.json(animals);
 });
 
-app.get("/animals/:id", (req, res) => {
-  const animalId = parseInt(req.params.id);
-  const findAnimal = animals.find((animal) => animal.id === animalId);
+// GET /animals/search?art=dog: Filter animals by their art
+//
+// example: GET localhost:5005/animals/search?art=cat
+//
+app.get("/animals/search", (req, res) => {
+  const art = req.query.art;
+  const filteredAnimals = animals.filter((animal) => animal.animalArt === art);
+  res.json(filteredAnimals);
+});
 
-  if (!findAnimal) {
+// GET /animals/:id: Return the animal with the specified ID
+//
+// example: GET localhost:5005/animals/3
+//
+app.get("/animals/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const animal = animals.find((animal) => animal.id === id);
+  if (!animal) {
     return res.status(404).json({ error: "Animal not found" });
   }
-
-  res.json(findAnimal);
+  res.json(animal);
 });
 
-//app.get("/animals/art", (req, res) => {
-//const { name, art, age } = req.query;
-//const output = animals;
-
-//if (name) output = output.filter((animal) => animal.animalName == name);
-//if (art) output = output.filter((animal) => animal.animalArt == art);
-// if (age) output = output.filter((animal) => animal.age == age);
-
-// res.json(animals.animalName);
-//});
-
-ap.get("/animals/art", (req, res) => {
-  const animalArt = req.query.art;
-  const output = animals.filter((animals) => animals.animalArt === animalArt);
-  res.json(output);
-});
-
-// route GET /tiere/search?art=hund
-
-app.get("/animals/age", (req, res) => {
-  const animalAge = req.query.age;
-  const age = animals.filter((animals) => animals.age === age);
-  res.json(age);
-});
-
-app.use(express.json()); // allows to send the body with the request
+// POST /animals: Insert a new animal via JSON body
+//
+// example: POST localhost:5005/animals
+//
+// JSON in body:
+//
+// {
+//   "animalArt": "rabbit",
+//   "animalName": "Thumper",
+//   "age": 3
+// }
+//
 app.post("/animals", (req, res) => {
-  const { art, name, age } = req.body; // the way of writing == "Destructuring" -> jason format as dictionary
+  const animalArt = req.body.animalArt;
+  const animalName = req.body.animalName;
+  const age = req.body.age;
+
   const newAnimal = {
-    id: animal.length + 1,
-    animalArt: art,
-    animalName: name,
-    age: age,
+    id: animals.length + 1,
+    animalArt,
+    animalName,
+    age,
   };
-  users.push(newAnimal(newAnimal));
-  res.json(animals);
+
+  animals.push(newAnimal);
+  res.status(201).json(newAnimal);
 });
 
-app.listen(5005);
+app.listen(5005, () => {
+  console.log(`Server runs under http://localhost:5005`);
+});
